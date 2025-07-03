@@ -15,10 +15,12 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
 app.use('/api/users', userRoutes);
 app.use('/api/pets', petRoutes);
+
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
 
 const startServer = async () => {
   try {
