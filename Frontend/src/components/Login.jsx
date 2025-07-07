@@ -19,6 +19,7 @@ const validate = (values) => {
   }
   return errors;
 };
+const baseUrl = "https://pet-adoption-hpf2.onrender.com/api";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +31,7 @@ const Login = () => {
     onSubmit: async (values) => {
       try {
         const { data } = await axios.post(
-          `http://localhost:3000/api/users/login`,
+          `${baseUrl}/users/login`,
           values,
           {
             headers: { "Content-Type": "application/json" },

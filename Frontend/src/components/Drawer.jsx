@@ -16,6 +16,7 @@ const validate = (values) => {
   return errors;
 };
 const token = localStorage.getItem("Token");
+const baseUrl = "https://pet-adoption-hpf2.onrender.com/api";
 
 const Drawer = ({
   setShowDrawer,
@@ -68,7 +69,7 @@ const Drawer = ({
       try {
         if (isEdit) {
           const response = await axios.put(
-            `http://localhost:3000/api/pets/update/${editPet._id}`,
+            `${baseUrl}/pets/update/${editPet._id}`,
             formData,
             {
               headers: {
@@ -81,7 +82,7 @@ const Drawer = ({
           toast.success(response.data.message || "Pet updated!");
         } else {
           const res = await axios.post(
-            "http://localhost:3000/api/pets/add",
+            `${baseUrl}/pets/add`,
             formData,
             {
               headers: {
