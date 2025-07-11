@@ -21,10 +21,11 @@ const Navbar = () => {
    const getPets = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3000/api/pets/all");
+      const response = await axios.get("https://pet-adoption-hpf2.onrender.com/api/pets/all");
       setPets(response.data);
       setLoading(false);
-    } catch (err) {
+    } catch (error) {
+      console.log(error);
       setLoading(false);
     }
   };

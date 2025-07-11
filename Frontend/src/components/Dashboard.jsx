@@ -1,11 +1,10 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Drawer from "./Drawer";
 import { toast } from "react-toastify";
 import { FaEdit, FaTrash, FaPaw } from "react-icons/fa";
 
-const Dashboard = ({ pets, loading, getPets }) => {
-  const [error, setError] = useState(null);
+const Dashboard = ({ pets, getPets }) => {
   const [selectedPet, setSelectedPet] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [showDrawer, setShowDrawer] = useState(false);
@@ -19,7 +18,7 @@ const Dashboard = ({ pets, loading, getPets }) => {
   const handleDelete = async (petId) => {
     try {
       const response = await axios.delete(
-        `http://localhost:3000/api/pets/delete/${petId}`,
+        `https://pet-adoption-hpf2.onrender.com/api/pets/delete/${petId}`,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -29,8 +28,8 @@ const Dashboard = ({ pets, loading, getPets }) => {
       );
       getPets();
       toast.success(response.data.message);
-    } catch (err) {
-      setError("Failed to delete pet");
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -80,7 +79,7 @@ const Dashboard = ({ pets, loading, getPets }) => {
               >
                 <div className="relative mb-4">
                   <img
-                    src={`http://localhost:3000/${pet?.images?.[0]}`}
+                    src={`${pet?.images?.[0]}`}
                     alt={pet.name}
                     className="w-28 h-28 rounded-full object-cover border-4 border-blue-100 group-hover:border-blue-400 shadow-lg transition-all duration-300 bg-white"
                   />
@@ -163,7 +162,7 @@ const Dashboard = ({ pets, loading, getPets }) => {
                     {selectedPet.images.map((img, idx) => (
                       <img
                         key={idx}
-                        src={`http://localhost:3000/${img}`}
+                        src={`${img}`}
                         alt={selectedPet.name}
                         className="w-20 h-20 rounded-full object-cover border-4 border-blue-200 shadow-md hover:scale-105 transition-all duration-200 bg-white"
                       />
@@ -171,7 +170,7 @@ const Dashboard = ({ pets, loading, getPets }) => {
                   </div>
                 ) : (
                   <img
-                    src={`http://localhost:3000/${selectedPet?.images?.[0]}`}
+                    src={`${selectedPet?.images?.[0]}`}
                     alt={selectedPet.name}
                     className="w-32 h-32 rounded-full object-cover border-4 border-blue-300 shadow-lg bg-white"
                   />
