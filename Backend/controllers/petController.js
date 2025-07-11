@@ -1,16 +1,24 @@
 const Pet = require("../models/petModel");
 const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
+// Use memory storage for multer
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+async function uploadToCloudinary(buffer, filename) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "pets", public_id: filename.split(".")[0] },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+}
 
 const createPet = async (req, res) => {
   try {
@@ -24,7 +32,12 @@ const createPet = async (req, res) => {
       birthDate,
       adoptionDatatime,
     } = req.body;
-    const images = req.files ? req.files.map((file) => file.path) : [];
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer, file.originalname))
+      );
+    }
     const newPet = new Pet({
       name,
       age,
@@ -81,8 +94,12 @@ const updatePet = async (req, res) => {
       birthDate,
       adoptionDatatime,
     } = req.body;
-    const images = req.files ? req.files.map((file) => file.path) : [];
-
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer, file.originalname))
+      );
+    }
     // Build updatedData object
     const updatedData = {
       name,
@@ -94,15 +111,12 @@ const updatePet = async (req, res) => {
       birthDate: new Date(birthDate),
       adoptionDatatime: adoptionDatatime ? new Date(adoptionDatatime) : null,
     };
-
     if (images.length > 0) {
       updatedData.images = images;
     }
-
     const updatedPet = await Pet.findByIdAndUpdate(petId, updatedData, {
       new: true,
     });
-
     if (!updatedPet) {
       return res.status(404).json({ message: "Pet not found" });
     }
